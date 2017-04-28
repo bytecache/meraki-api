@@ -1,0 +1,13 @@
+#########################
+#Default files to ignore#
+#########################
+#.gitignore
+############################
+#Virtualenv Files to ignore#
+############################
+venv/
+bin/
+lib/
+lib64
+pip-selfcheck.json
+pyvenv.cfg
