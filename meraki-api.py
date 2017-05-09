@@ -16,5 +16,6 @@ print("Response code: ", r)
 print("Raw Response: ", r.content)
 
 # Print formatted response
+formatteded_response = str(r.content,'utf-8')
 print("Formatted response: ")
-print (json.loads(str(r.content,'utf-8')))
+print (json.dumps(r.content, sort_keys=True, indent=4))
