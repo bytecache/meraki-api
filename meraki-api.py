@@ -1,31 +1,28 @@
 import os
+import sys
 import requests
 import json
 import sys
 import argparse
+import tabulate
 
-# Print response code
-#print("Response code: ", r)
-
-# Print response content
-#print("Raw Response: ", r.content)
-
-# Print formatted response
-#print("Formatted response: ")
-#print (json.loads(str(r.content,'utf-8')))
-
-# Json Response
-#print("JSON Response: ")
-#for r_item in r.json():
-#	print('{} {}'.format(r_item['id'], r_item['name']))
-#print (r.json())
+################################################
+# What's Next
+################################################
+# pullOrg - Ask what ORG to work on
+# pullOrg - Return ORG ID based on selection
+# Pass ORG ID into other fucntions
+################################################
 
 # Check API call response call
 def checkResponse (response):
 	sys.exit()
 
 # Pull organizations
-def pullOrgs (baseURL, headers):
+def pullOrgs (baseURL, headers, debugValue):
+	#Clear screen
+	os.system('cls' if os.name == 'nt' else 'clear')
+
 	full_url = baseURL + "organizations/"
 
 	# Pull orgs
@@ -33,48 +30,49 @@ def pullOrgs (baseURL, headers):
 
 	# Check response
 	if resp.status_code != 200:
-		print("GET /organizations/ Error Code: {}".format(resp.status_code))
+		print("GET " + full_url + " Error Code: {}".format(resp.status_code))
 		sys.exit()
 
-	# Print Organizations
-	print("Your Meraki Organizations")
-	for r_item in resp.json():
-		print('{} \n\t Org ID: {}'.format(r_item['name'], r_item['id']))
-
-    # Print raw response
+	# Generate Org Data as dictionary
 	org_data = resp.json()
-	print("\nRaw Response: ", org_data)
 
-	# Test print value
-	print(org_data[0]['id'])
+	# Print Organizations in table form
+	print("YOUR MERAKI ORGANIZATIONS\n")
+	print(tabulate.tabulate(org_data, headers="keys"))
+
+	
 
 # Pull the networks for an organization
-def pullOrgNetworks (baseURL, headers, orgID):
+def pullOrgNetworks (baseURL, headers, debugValue):
+	#Clear screen
+	os.system('cls' if os.name == 'nt' else 'clear')
+
+	# Print Orgs & ask user to select org ID
+	pullOrgs (base_url, headers, debugValue)
+	orgID = input("\nEnter Org ID from the above list: ")
+	print("Fetching Meraki organization networks...")
+
 	# Generate full API URL
 	full_url = baseURL + "organizations/" + str(orgID) + "/networks/"
 
 	# Pull org networks
 	resp = requests.get(full_url, headers=headers)
+	network_data = resp.json()
 
 	# Check response
 	if resp.status_code != 200:
-		print("GET /organizations/ Error Code: {}".format(resp.status_code))
+		print("\t ERROR: GET " + full_url + " Error Code: {}".format(resp.status_code))
 		sys.exit()
 
 	# Print raw response
-	network_data = resp.json()
 	#print("\nRaw Response: ", network_data)
 
-	# Print org networks
-	print("Meraki Networks for Org ID " + str(orgID))
-	for network in resp.json():
-		print('\t{}'.format(network['name']))
+	# Print org networks in table form
+	print("MERAKI NETWORKS\n")
+	print(tabulate.tabulate(network_data, headers="keys"))
 
 # Main function
-def main ():
-	#pullOrgs (url, headers)
-	#pullOrgNetworks(url,headers,618119048856601289)
-
+def main (debugValue):
 	# Setup argument parser
 	parser = argparse.ArgumentParser(description='Pull information from the Meraki dashboard via API.')
 	parser.add_argument('--list-orgs', action='store_true', help='List Meraki organizations')
@@ -101,4 +99,4 @@ def main ():
 	if args.list_orgs is True:
 		pullOrgs(base_url, headers)
 
-main()
+main(0)
