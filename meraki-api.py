@@ -2,13 +2,7 @@ import os
 import requests
 import json
 import sys
-
-api_key = os.getenv('MERAKI_API_KEY')
-
-url = 'https://dashboard.meraki.com/api/v0/'
-headers = {'X-Cisco-Meraki-API-Key': api_key}
-
-r = requests.get(url, headers=headers)
+import argparse
 
 # Print response code
 #print("Response code: ", r)
@@ -79,6 +73,32 @@ def pullOrgNetworks (baseURL, headers, orgID):
 # Main function
 def main ():
 	#pullOrgs (url, headers)
-	pullOrgNetworks(url,headers,618119048856601289)
+	#pullOrgNetworks(url,headers,618119048856601289)
+
+	# Setup argument parser
+	parser = argparse.ArgumentParser(description='Pull information from the Meraki dashboard via API.')
+	parser.add_argument('--list-orgs', action='store_true', help='List Meraki organizations')
+	parser.add_argument('--list-networks', action='store_true', help='List Meraki networks associated with an organization')
+	args = parser.parse_args()
+
+	# Check if no arguments are passed
+	if len(sys.argv) == 1:
+		parser.print_help()
+		parser.exit()
+
+	# Check is environment variable with API key is set
+	if 'MERAKI_API_KEY' in os.environ:
+		api_key = os.getenv('MERAKI_API_KEY')
+	else:
+		print("ERROR: MERAKI_API_KEY environment variable required")
+		sys.exit()
+
+	# Set base URL & headers for API call
+	base_url = 'https://dashboard.meraki.com/api/v0/'
+	headers = {'X-Cisco-Meraki-API-Key': api_key}
+
+	# Check arguments
+	if args.list_orgs is True:
+		pullOrgs(base_url, headers)
 
 main()
