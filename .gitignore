@@ -2,6 +2,7 @@
 #Default files to ignore#
 #########################
 .idea/
+.vscode/
 
 ############################
 #Virtualenv Files to ignore#
